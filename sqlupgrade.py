@@ -10,8 +10,6 @@ import logging
 import logging.handlers
 import datetime
 
-def logme(command,logdir):
-    # Log function adding the sql queries to a log file
 
 def takedigits(filenames):
     # we will keep a dictionary with filenames and the number, so we can easily keep a correlation
@@ -28,7 +26,6 @@ def takedigits(filenames):
     sqldict = collections.OrderedDict(sorted(resources.items()))
 
     return sqldict
-
 
 
 def main():
@@ -80,6 +77,9 @@ def main():
                                 # I will make an assumption that each sql file containes one query only.
                                 # If that's not the use case I would split the queries in a file with the ';' delimeter
                                 # *.read().split(';')) and then apply them
+                                logging.basicConfig(filename='example.log',level=logging.DEBUG)
+                                today = datetime.date.today()
+                                formatted_date = today.strftime('Applied in %d, %b %Y')
                                 for key,sqlscript in resources.items():
                                     #our Dict is sorted so we can just loop in the items - last element is the higher one
                                     if key > current_version:
@@ -90,13 +90,14 @@ def main():
                                         connection = pymysql.connect(host=sys.argv[3], port=3306, user=sys.argv[2], passwd=sys.argv[5], db=sys.argv[4])
                                         try:
                                             cur = connection.cursor()
+                                            print "[INFO] Running sql query from file: %s" %sqlscript
                                             cur.execute(sql)
-                                            #add log functionality
-
+                                            logging.debug(formatted_date + '\n' + sqlscript)
                                             # commit the changes
                                             connection.commit()
-                                        except MySQLError as error:
-                                            print error
+                                        except pymysql.InternalError as error:
+                                            code, message = error.args
+                                            print message
                                             raise SystemExit
                                         finally:
                                             connection.close()
