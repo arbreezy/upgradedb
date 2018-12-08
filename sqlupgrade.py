@@ -112,8 +112,9 @@ def main():
                                 update = "UPDATE versionTable SET version = %s"
                                 cur.execute(update,(current_version))
                                 connection.commit()
-                            except MySQLError as error:
-                                print error
+                            except pymysql.InternalError as error:
+                                code, message = error.args
+                                print message as error:
                                 raise SystemExit
                             finally:
                                 connection.close()
