@@ -114,7 +114,7 @@ def main():
                                 connection.commit()
                             except pymysql.InternalError as error:
                                 code, message = error.args
-                                print message as error:
+                                print message 
                                 raise SystemExit
                             finally:
                                 connection.close()
